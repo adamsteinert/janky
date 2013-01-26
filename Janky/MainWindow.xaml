@@ -1,0 +1,72 @@
+﻿<Controls:MetroWindow x:Class="Janky.MainWindow" 
+        xmlns:Controls="clr-namespace:MahApps.Metro.Controls;assembly=MahApps.Metro"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:Janky="clr-namespace:Janky"
+        xmlns:Views="clr-namespace:Janky.Views" Title="Jenkins Status Viewer" Height="550" Width="525" Icon="janky.ico">
+    
+    <Window.TaskbarItemInfo>
+        <TaskbarItemInfo x:Name="theInfo" />
+    </Window.TaskbarItemInfo>
+    
+    <Window.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Colours.xaml" />
+                <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Fonts.xaml" />
+                <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Controls.xaml" />
+                <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Accents/Blue.xaml" />
+                <ResourceDictionary Source="pack://application:,,,/MahApps.Metro;component/Styles/Accents/BaseLight.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </Window.Resources>
+    
+    <Grid Margin="8">       
+        <Grid.Resources>
+            <BooleanToVisibilityConverter x:Key="Bool2Vis" />
+        </Grid.Resources>
+        <ScrollViewer VerticalScrollBarVisibility="Auto">
+            <ListView ItemsSource="{Binding Jobs}" >
+                <ListView.ItemTemplate>
+                    <DataTemplate>
+                        <Views:JobView />
+                    </DataTemplate>
+                </ListView.ItemTemplate>
+            </ListView>
+        </ScrollViewer>
+
+        <!--<TextBlock Text="Updating..." HorizontalAlignment="Center" VerticalAlignment="Center" 
+                   FontSize="30" FontWeight="Bold" Foreground="gray"
+                   Visibility="{Binding IsBusy, Converter={StaticResource Bool2Vis}}" />-->
+
+        <StackPanel Orientation="Horizontal" VerticalAlignment="Bottom" Visibility="{Binding IsBusy, Converter={StaticResource Bool2Vis}}" Margin="40 0 0 0">
+             <Controls:ProgressRing IsActive="{Binding IsBusy}" />
+
+            <TextBlock Text="Updating..." HorizontalAlignment="Center" VerticalAlignment="Center" Margin="12 0 0 0"
+                   FontSize="30" FontWeight="Bold" Foreground="gray"
+                   Visibility="{Binding IsBusy, Converter={StaticResource Bool2Vis}}" />
+        </StackPanel>
+
+
+
+        <TextBlock  HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="0 0 40 0">
+            <Run Text="Last Updated:" />
+            <Run Text="{Binding LastUpdated, StringFormat={}{0:MM/dd/yy hh:mm tt}}" />
+        </TextBlock>
+
+        <Border Background="#AA000000" Margin="20" CornerRadius="0" Padding="20" Visibility="{Binding ExperiencingErrors, Converter={StaticResource Bool2Vis}}">
+            <StackPanel >
+                <!--<TextBlock Text="We have a problem..." HorizontalAlignment="Center" VerticalAlignment="Center" Margin="12 0 0 0"
+                   FontSize="20" FontWeight="Bold" Foreground="Red" />-->
+
+                <TextBlock HorizontalAlignment="Left" VerticalAlignment="Center" Margin="12 8 0 0" FontSize="16" FontWeight="Bold" Foreground="White"
+                           TextWrapping="Wrap">
+                    Unable to update status.  This is probably a configuration or connectivity issue:
+                </TextBlock>
+
+                <TextBlock HorizontalAlignment="Left" VerticalAlignment="Center" Margin="12 8 0 0" FontSize="12" FontWeight="Bold" Foreground="Red"
+                           TextWrapping="Wrap" Text="{Binding ErrorMessage}">
+                </TextBlock>
+            </StackPanel>
+        </Border>
+    </Grid>
+</Controls:MetroWindow>
