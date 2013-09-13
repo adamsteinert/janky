@@ -22,30 +22,51 @@ namespace Janky.Service
 
         public ServerStatus GetServerStats()
         {
-            using (var w = new WebClient())
+            try
             {
-                var json_data = string.Empty;
+                using (var w = new WebClient())
+                {
+                    var json_data = string.Empty;
 
-                json_data = w.DownloadString(CreateCommand(_jenkinsBaseUrl, Commands.ServerStatus));
+                    json_data = w.DownloadString(CreateCommand(_jenkinsBaseUrl, Commands.ServerStatus));
 
-                return JsonConvert.DeserializeObject<ServerStatus>(json_data);
+                    return JsonConvert.DeserializeObject<ServerStatus>(json_data);
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+                throw;
             }
         }
 
         public ShortJobStatus GetJobStatus(string jobName)
         {
-            string url = _jenkinsBaseUrl + "/job/" + jobName;
-            url = Uri.EscapeUriString(url);
-
-            using (var w = new WebClient())
+            string url = string.Empty;
+            try
             {
-                var json_data = string.Empty;
+                url = _jenkinsBaseUrl + "/job/" + jobName;
+                url = Uri.EscapeUriString(url);
 
-                string command = CreateCommand(url, Commands.JobStatus);
-                json_data = w.DownloadString(command);
+                using (var w = new WebClient())
+                {
+                    var json_data = string.Empty;
 
-                return JsonConvert.DeserializeObject<ShortJobStatus>(json_data);
-            } 
+                    string command = CreateCommand(url, Commands.JobStatus);
+                    json_data = w.DownloadString(command);
+
+                    return JsonConvert.DeserializeObject<ShortJobStatus>(json_data);
+                }
+            }
+            catch (Exception ex)
+            {
+                return new ShortJobStatus()
+                    {
+                        Building = false,
+                        Job =  new Job() { Color = "red", Name = url, Url = url},
+                        Result = "error"
+                    };
+            }
         }
 
 

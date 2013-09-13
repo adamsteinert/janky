@@ -97,7 +97,7 @@ namespace Janky.ViewModels
                 if(Jobs.Count > 0)
                     Jobs.Clear();
 
-                foreach (var steve in stats.Jobs)
+                foreach (var steve in stats.Jobs.Where(x => x.Color != "disabled"))
                 {
                     var item = _service.GetJobStatus(steve.Name);
                     item.Job = steve;
@@ -136,29 +136,51 @@ namespace Janky.ViewModels
 
         private void SetTaskbarWorking()
         {
-            SetTaskbarOverlay(OverlayState.None);
-            _taskbar.ProgressState = TaskbarItemProgressState.Indeterminate;
+            try
+            {
+                SetTaskbarOverlay(OverlayState.None);
+                _taskbar.ProgressState = TaskbarItemProgressState.Indeterminate;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("Taskbar down " + ex.Message);
+            }
         }
 
         private void SetTaskbarCondition(bool isNormal)
         {
-            _taskbar.ProgressValue = 1;
-            _taskbar.ProgressState = isNormal ? NormalState : TaskbarItemProgressState.Error;
+            try
+            {
+                _taskbar.ProgressValue = 1;
+                _taskbar.ProgressState = isNormal ? NormalState : TaskbarItemProgressState.Error;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("Taskbar down " + ex.Message);
+            }
+
         }
 
         private void SetTaskbarOverlay(OverlayState state)
         {
-            switch (state)
+            try
             {
-                case OverlayState.None:
-                    _taskbar.Overlay = null;
-                    break;
-                case OverlayState.Error:
-                    _taskbar.Overlay = new BitmapImage(new Uri("pack://application:,,,/Janky;component/Assets/skull.png"));
-                    break;
-                case OverlayState.OutOfDate:
-                    _taskbar.Overlay = new BitmapImage(new Uri("pack://application:,,,/Janky;component/Assets/exclaimation_mark.png"));
-                    break;
+                switch (state)
+                {
+                    case OverlayState.None:
+                        _taskbar.Overlay = null;
+                        break;
+                    case OverlayState.Error:
+                        _taskbar.Overlay = new BitmapImage(new Uri("pack://application:,,,/Janky;component/Assets/skull.png"));
+                        break;
+                    case OverlayState.OutOfDate:
+                        _taskbar.Overlay = new BitmapImage(new Uri("pack://application:,,,/Janky;component/Assets/exclaimation_mark.png"));
+                        break;
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("Taskbar down " + ex.Message);
             }
         }
 
